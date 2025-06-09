@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2D to 3D Engineering Drawing Converter</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+  :root {
+    --color-bg: #ffffff;
+    --color-text-primary: #374151;
+    --color-text-secondary: #6b7280;
+    --color-accent: #2563eb;
+    --color-accent-hover: #1d4ed8;
+    --border-radius: 12px;
+    --shadow-light: 0 4px 12px rgba(0,0,0,0.05);
+    --transition-fast: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    background: var(--color-bg);
+    box-shadow: var(--shadow-light);
+    padding: 1rem 1.5rem;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header .logo {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--color-accent);
+    user-select: none;
+  }
+
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .hero {
+    text-align: center;
+    padding-top: 3rem;
+  }
+
+  .hero h1 {
+    font-weight: 700;
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+  }
+
+  .hero p {
+    color: var(--color-text-secondary);
+    font-size: 1.125rem;
+    max-width: 650px;
+    margin: 0 auto;
+  }
+
+  .upload-section {
+    background: #f9fafb;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .upload-section label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+  }
+
+  .upload-section input[type="file"] {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1.5px solid #d1d5db;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: border-color var(--transition-fast);
+  }
+  .upload-section input[type="file"]:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+
+  select {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    border: 1.5px solid #d1d5db;
+    border-radius: var(--border-radius);
+    background: white;
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+  }
+  select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    background: #ffffff;
+  }
+
+  label img {
+    max-width: 100%;
+  }
+
+  button.convert-btn {
+    background: var(--color-accent);
+    border: none;
+    color: white;
+    padding: 0.8rem 1.6rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    grid-column: span 2;
+    justify-self: center;
+    margin-top: 1rem;
+    width: 200px;
+  }
+  button.convert-btn:hover,
+  button.convert-btn:focus {
+    background: var(--color-accent-hover);
+    outline: none;
+  }
+
+  .viewer-container {
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    background: #f9fafb;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  @media (max-width: 768px) {
+    .upload-section {
+      grid-template-columns: 1fr;
+    }
+    button.convert-btn {
+      width: 100%;
+      grid-column: initial;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" aria-label="2D to 3D Converter">2D→3D-Converter</div>
+</header>
+<main>
+  <section class="hero" aria-label="Application introduction">
+    <h1>حول رسمك الهندسي ثنائي الأبعاد إلى نموذج ثلاثي الأبعاد قابل للتصنيع</h1>
+    <p>ارفع ملف الرسم الهندسي بأي صيغة 2D، واختر المواد وطريقة التصنيع، وشاهد نموذجك ثلاثي الأبعاد بحجم حقيقي.</p>
+  </section>
+
+  <section class="upload-section" aria-label="Drawing upload and options">
+    <div>
+      <label for="fileInput">رفع ملف الرسم الهندسي 2D (SVG, DXF, أو ملف نصي)</label>
+      <input type="file" id="fileInput" accept=".svg,.dxf,.txt" aria-describedby="fileHelp" />
+      <small id="fileHelp" style="color:var(--color-text-secondary)">يدعم SVG وDXF وملفات نصية 2D بسيطة</small>
+    </div>
+    <div>
+      <label for="materialSelect">اختر مادة التصنيع</label>
+      <select id="materialSelect" aria-label="List of manufacturing materials">
+        <option value="aluminum">ألمنيوم</option>
+        <option value="steel">صلب</option>
+        <option value="plastic">بلاستيك</option>
+        <option value="wood">خشب</option>
+      </select>
+
+      <label for="methodSelect" style="margin-top:1.5rem; display:block;">اختر طريقة التصنيع</label>
+      <select id="methodSelect" aria-label="List of manufacturing methods">
+        <option value="cnc">CNC قطع وتحويل</option>
+        <option value="3dprint">طباعة ثلاثية الأبعاد</option>
+        <option value="laser">قطع ليزر</option>
+        <option value="milling">تفريز</option>
+      </select>
+
+      <button class="convert-btn" id="convertBtn" aria-live="polite" aria-disabled="true" disabled>تحويل إلى 3D</button>
+    </div>
+  </section>
+
+  <section aria-label="3D model viewer" class="viewer-container" id="viewerContainer">
+    <!-- Three.js Canvas will be appended here -->
+    <p style="color:var(--color-text-secondary)">رفغ ملف لرؤية النموذج ثلاثي الأبعاد...</p>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/loaders/SVGLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+<script>
+  (() => {
+    const fileInput = document.getElementById('fileInput');
+    const materialSelect = document.getElementById('materialSelect');
+    const methodSelect = document.getElementById('methodSelect');
+    const convertBtn = document.getElementById('convertBtn');
+    const viewerContainer = document.getElementById('viewerContainer');
+
+    let scene, camera, renderer, controls;
+    let modelGroup = null;
+
+    // Enable convert button only when a file is selected
+    fileInput.addEventListener('change', () => {
+      convertBtn.disabled = !fileInput.files.length;
+      convertBtn.setAttribute('aria-disabled', convertBtn.disabled.toString());
+    });
+
+    // Initialize Three.js scene
+    function initThree() {
+      // Clear previous if exists
+      while(viewerContainer.firstChild) {
+        viewerContainer.removeChild(viewerContainer.firstChild);
+      }
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf9fafb);
+
+      const width = viewerContainer.clientWidth;
+      const height = viewerContainer.clientHeight;
+
+      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.set(0, 0, 150);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+      renderer.setSize(width, height);
+      viewerContainer.appendChild(renderer.domElement);
+
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(40, 50, 50);
+      scene.add(directionalLight);
+
+      // Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.1;
+
+      // Group to hold model
+      modelGroup = new THREE.Group();
+      scene.add(modelGroup);
+
+      animate();
+    }
+
+    // Animate loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    // Translate material selection to basic material properties
+    function getMaterial(name) {
+      switch(name) {
+        case 'aluminum':
+          return new THREE.MeshStandardMaterial({ color: 0xb0b0b0, metalness: 0.8, roughness: 0.3 });
+        case 'steel':
+          return new THREE.MeshStandardMaterial({ color: 0x606060, metalness: 1.0, roughness: 0.25 });
+        case 'plastic':
+          return new THREE.MeshStandardMaterial({ color: 0x70a1ff, metalness: 0.2, roughness: 0.7 });
+        case 'wood':
+          return new THREE.MeshStandardMaterial({ color: 0xa9746e, metalness: 0.1, roughness: 0.9 });
+        default:
+          return new THREE.MeshStandardMaterial({ color: 0xcccccc });
+      }
+    }
+
+    // Extrude SVG paths to 3D shape
+    function create3DFromSVGPaths(paths, material) {
+      const group = new THREE.Group();
+      const extrudeSettings = { depth: 10, bevelEnabled: false };
+
+      paths.forEach(path => {
+        const shapes = path.toShapes(true);
+        shapes.forEach(shape => {
+          const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.position.z = -extrudeSettings.depth / 2;
+          group.add(mesh);
+        });
+      });
+
+      // Center the group
+      const box = new THREE.Box3().setFromObject(group);
+      const center = box.getCenter(new THREE.Vector3());
+      group.position.x -= center.x;
+      group.position.y -= center.y;
+
+      return group;
+    }
+
+    // Parse uploaded file and convert
+    function parseFileAndConvert(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (ext === 'svg') {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const contents = evt.target.result;
+          const loader = new THREE.SVGLoader();
+          const svgData = loader.parse(contents);
+          if (modelGroup) {
+            scene.remove(modelGroup);
+          }
+          modelGroup = create3DFromSVGPaths(svgData.paths, getMaterial(materialSelect.value));
+          scene.add(modelGroup);
+        };
+        reader.readAsText(file);
+      }
+      else if (ext === 'dxf' || ext === 'txt') {
+        // Basic DXF or 2D line parsing to approximate a simple extrusion - demo only
+        // We'll parse as lines and create extruded rectangular shapes per line segment as an example
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const contents = evt.target.result;
+          // For simplicity, let's parse simple DXF POLYLINEs or LINE entities (very rudimentary)
+          const lines = [];
+
+          // Using regex to extract LINE entities as pairs of points for demo purposes:
+          // DXF entities: LINE with 10,20 as start point and 11,21 as endpoint
+          const lineRegex = /LINE[^]*?10\s*(-?\d+\.?\d*)[^]*?20\s*(-?\d+\.?\d*)[^]*?11\s*(-?\d+\.?\d*)[^]*?21\s*(-?\d+\.?\d*)/gmi;
+          let match;
+          while ((match = lineRegex.exec(contents)) !== null) {
+            const x1 = parseFloat(match[1]), y1 = parseFloat(match[2]);
+            const x2 = parseFloat(match[3]), y2 = parseFloat(match[4]);
+            lines.push({ start: new THREE.Vector2(x1, y1), end: new THREE.Vector2(x2, y2) });
+          }
+
+          if (modelGroup) {
+            scene.remove(modelGroup);
+          }
+          modelGroup = new THREE.Group();
+
+          const material = getMaterial(materialSelect.value);
+          // Create boxes to represent line extrusion along Z axis
+          lines.forEach(line => {
+            const length = line.start.distanceTo(line.end);
+            const angle = Math.atan2(line.end.y - line.start.y, line.end.x - line.start.x);
+
+            // rectangular box geometry as extrusion of line with small thickness and fixed depth
+            const geometry = new THREE.BoxGeometry(length, 1, 10);
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.x = (line.start.x + line.end.x) / 2;
+            mesh.position.y = (line.start.y + line.end.y) / 2;
+            mesh.position.z = -5; // half depth negative to center
+            mesh.rotation.z = angle;
+            modelGroup.add(mesh);
+          });
+
+          // Center the group
+          const box = new THREE.Box3().setFromObject(modelGroup);
+          const center = box.getCenter(new THREE.Vector3());
+          modelGroup.position.x -= center.x;
+          modelGroup.position.y -= center.y;
+
+          scene.add(modelGroup);
+        };
+        reader.readAsText(file);
+      }
+      else {
+        alert('صيغة الملف غير مدعومة حالياً. يرجى رفع ملفات SVG أو DXF.');
+      }
+    }
+
+    convertBtn.addEventListener('click', () => {
+      if (!fileInput.files.length) return;
+      parseFileAndConvert(fileInput.files[0]);
+    });
+
+    // Recreate material on change and update model material if any
+    materialSelect.addEventListener('change', () => {
+      if (!modelGroup) return;
+      const newMaterial = getMaterial(materialSelect.value);
+      modelGroup.traverse(obj => {
+        if (obj.isMesh) obj.material = newMaterial;
+      });
+    });
+
+    // Initialize 3D viewer on page load
+    window.addEventListener('load', () => {
+      initThree();
+    });
+
+    // Handle resizing
+    window.addEventListener('resize', () => {
+      if (!renderer || !camera) return;
+      const width = viewerContainer.clientWidth;
+      const height = viewerContainer.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    });
+  })();
+</script>
+</body>
+</html>
+
